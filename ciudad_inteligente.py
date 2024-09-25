@@ -1,11 +1,14 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
+from nodo import Nodo
+from busqueda_no_informada import busqueda_profundidad_eviar_ciclos
+from leer_mapa import leer_mapa
 
 class InterfazCiudad:
     def __init__(self):
         self.ventana = tk.Tk()
         self.ventana.title("Ciudad Inteligente")
-        self.ventana.geometry('900x750')
+        self.ventana.geometry('900x700')
         self.ventana.configure(bg='#dad082')
         self.crear_frames()
         self.crear_cuadricula()
@@ -71,6 +74,7 @@ class InterfazCiudad:
         self.menu_algoritmo = ttk.Combobox(
             frame_algoritmo,
             textvariable=self.algoritmo,
+            values=["Búsqueda no informada - evitando ciclos"],
             state="readonly"
         )
         self.menu_algoritmo.pack()
@@ -108,6 +112,69 @@ class InterfazCiudad:
             bg='#dad082'
         )
         self.mensaje_estado.pack(side=tk.BOTTOM, fill='x')
+
+    def cargar_archivo(self):
+        self.archivo_mapa = filedialog.askopenfilename(
+            title="Seleccionar archivo de mapa",
+            filetypes=(("Archivos de texto", "*.txt"),("Todos los archivos", "*.*"))
+        )
+        if not self.archivo_mapa:
+            messagebox.showerror("Error", "Debe seleccionar un archivo de mapa")
+        else:
+            try:
+                self.ciudad = leer_mapa(self.archivo_mapa)
+                print(self.ciudad)
+                self.mostrar_mapa()
+            except Exception as e:
+                messagebox.showerror("Error", f"Error al cargar el archivo: {e}")
+
+    def mostrar_mapa(self):
+        if self.ciudad: # Si hay un mapa cargado
+            self.canvas.delete("all")
+            for i, fila in enumerate(self.ciudad): # Recorre las filas
+                for j, valor in enumerate(fila): # Recorre los valores de la fila
+                    color = self.obtener_color(valor) # Obtiene el color según el valor
+                    self.canvas.create_rectangle( # Dibuja un rectángulo
+                        j ** self.tam_celda, 
+                        i ** self.tam_celda,
+                        (j + 1) ** self.tam_celda,
+                        (i + 1) ** self.tam_celda,
+                        fill=color # Color del rectángulo
+                    )
+                    print(f"Dibuja celda ({i}, {j}) con color {color}")
+
+    def obtener_color(self, valor):
+        if valor == 0:
+            return "white" # Trafico liviano/ Casilla blanca
+        elif valor == 1:
+            return "grey" #Muro/ Casilla gris
+        elif valor == 2:
+            return "yellow" #Vehiculo/ Casilla amarilla
+        elif valor == 3:
+            return "green" #Trafico mediano / Casilla verde
+        elif valor == 4:
+            return "red" #Trafico pesado / Casilla roja
+        elif valor == 5:
+            return "blue" #Pasajero / Casilla azul
+        elif valor == 6:
+            return "orange" #Destino / Casilla naranja        
+        else:
+            return "white"
+
+    def buscar_camino(self):
+        if self.ciudad is None:
+            messagebox.showerror("Error", "Debe cargar un archivo de mapa")
+            return
+        
+        nodo_inicial = Nodo(self.ciudad)
+
+        if self.algoritmo.get() == "Búsqueda no informada - evitando ciclos":
+            nodo_meta = busqueda_profundidad_evitar_ciclos(nodo_inicial)
+        if nodo_meta:
+            messagebox.showinfo("Información", "¡Solución encontrada!")
+            self.mostrar_mapa_final(nodo_meta.obteenr_camino())
+        else:
+            maessagebox.showinfo("Información", "¡No se encontró solución!")
 
 if __name__ == "__main__":
     InterfazCiudad()
