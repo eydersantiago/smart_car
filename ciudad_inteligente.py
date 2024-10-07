@@ -3,9 +3,10 @@ from tkinter import filedialog, messagebox, ttk
 from PIL import Image, ImageTk
 from amplitud import BFSMixin 
 from busqueda_no_informada import DFSMixin 
+from costo_uniforme import CostoUniformeMixin
 
 
-class CiudadInteligente(BFSMixin, DFSMixin):
+class CiudadInteligente(BFSMixin, DFSMixin, CostoUniformeMixin):
     def __init__(self, archivo_mapa):
         self.mapa = self.cargar_mapa(archivo_mapa)
         self.posicion_vehiculo = self.encontrar_posicion(2)
@@ -262,85 +263,70 @@ class InterfazCiudadGUI:
         tipo_busqueda = self.tipo_busqueda.get()
         algoritmo = self.algoritmo.get()
 
+        # Deshabilitar botones durante la búsqueda
+        self.boton_buscar.config(state=tk.DISABLED)
+        self.boton_cargar.config(state=tk.DISABLED)
+        self.menu_busqueda.config(state=tk.DISABLED)
+        self.menu_algoritmo.config(state=tk.DISABLED)
+
+        # Resetear el contador de nodos
+        self.ciudad.contador_nodos = 0
+
         if tipo_busqueda == "No informada" and algoritmo == "Amplitud":
-            # Deshabilitar botones durante la búsqueda
-            self.boton_buscar.config(state=tk.DISABLED)
-            self.boton_cargar.config(state=tk.DISABLED)
-            self.menu_busqueda.config(state=tk.DISABLED)
-            self.menu_algoritmo.config(state=tk.DISABLED)
-
-            # Resetear el contador de nodos
-            self.ciudad.contador_nodos = 0
-
             # Realizar la búsqueda por amplitud
             try:
                 camino, nodos_expandidos, exploracion = self.ciudad.busqueda_amplitud_total()
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
                 # Habilitar botones nuevamente
-                self.boton_buscar.config(state=tk.NORMAL)
-                self.boton_cargar.config(state=tk.NORMAL)
-                self.menu_busqueda.config(state=tk.NORMAL)
-                self.menu_algoritmo.config(state=tk.NORMAL)
+                self.habilitar_botones()
                 return
-
-            if not camino:
-                messagebox.showerror("Error", "No se encontró un camino válido.")
-                # Habilitar botones nuevamente
-                self.boton_buscar.config(state=tk.NORMAL)
-                self.boton_cargar.config(state=tk.NORMAL)
-                self.menu_busqueda.config(state=tk.NORMAL)
-                self.menu_algoritmo.config(state=tk.NORMAL)
-                return
-
-            # Iniciar la animación de la búsqueda
-            self.exploracion = exploracion
-            self.camino = camino
-            self.nodos_expandidos = nodos_expandidos
-            self.paso_actual = 0
-            self.dibujar_mapa()
-            self.animar_busqueda()
 
         elif tipo_busqueda == "No informada" and algoritmo == "Profundidad evitando ciclos":
-            # Deshabilitar botones durante la búsqueda
-            self.boton_buscar.config(state=tk.DISABLED)
-            self.boton_cargar.config(state=tk.DISABLED)
-            self.menu_busqueda.config(state=tk.DISABLED)
-            self.menu_algoritmo.config(state=tk.DISABLED)
-
-            # Resetear el contador de nodos
-            self.ciudad.contador_nodos = 0
-
             # Realizar la búsqueda por profundidad
             try:
                 camino, nodos_expandidos, exploracion = self.ciudad.busqueda_profundidad_total()
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
                 # Habilitar botones nuevamente
-                self.boton_buscar.config(state=tk.NORMAL)
-                self.boton_cargar.config(state=tk.NORMAL)
-                self.menu_busqueda.config(state=tk.NORMAL)
-                self.menu_algoritmo.config(state=tk.NORMAL)
-                return
-            
-            if not camino:
-                messagebox.showerror("Error", "No se encontró un camino válido.")
-                # Habilitar botones nuevamente
-                self.boton_buscar.config(state=tk.NORMAL)
-                self.boton_cargar.config(state=tk.NORMAL)
-                self.menu_busqueda.config(state=tk.NORMAL)
-                self.menu_algoritmo.config(state=tk.NORMAL)
+                self.habilitar_botones()
                 return
 
-            # Iniciar la animación de la búsqueda
-            self.exploracion = exploracion
-            self.camino = camino
-            self.nodos_expandidos = nodos_expandidos
-            self.paso_actual = 0
-            self.dibujar_mapa()
-            self.animar_busqueda()
+        elif tipo_busqueda == "No informada" and algoritmo == "Costo uniforme":
+            # Realizar la búsqueda de costo uniforme
+            try:
+                camino, nodos_expandidos, costo_total, exploracion = self.ciudad.busqueda_costo_uniforme_total()
+            except AttributeError as e:
+                messagebox.showerror("Error", f"Error en la búsqueda: {e}")
+                # Habilitar botones nuevamente
+                self.habilitar_botones()
+                return
+
         else:
             messagebox.showerror("Error", "Algoritmo no implementado o incorrecto.")
+            self.habilitar_botones()
+            return
+
+        if not camino:
+            messagebox.showerror("Error", "No se encontró un camino válido.")
+            self.habilitar_botones()
+            return
+
+        # Iniciar la animación de la búsqueda
+        self.exploracion = exploracion
+        self.camino = camino
+        self.nodos_expandidos = nodos_expandidos
+        self.paso_actual = 0
+        self.dibujar_mapa()
+        self.animar_busqueda()
+
+    def habilitar_botones(self):
+        # Habilitar botones nuevamente
+        self.boton_buscar.config(state=tk.NORMAL)
+        self.boton_cargar.config(state=tk.NORMAL)
+        self.menu_busqueda.config(state=tk.NORMAL)
+        self.menu_algoritmo.config(state=tk.NORMAL)
+
 
     def animar_busqueda(self):
         if self.paso_actual < len(self.exploracion):
