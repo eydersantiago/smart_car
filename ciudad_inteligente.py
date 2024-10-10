@@ -4,9 +4,10 @@ from PIL import Image, ImageTk
 from amplitud import BFSMixin 
 from busqueda_no_informada import DFSMixin 
 from costo_uniforme import CostoUniformeMixin
+from avara import AvaraMixin
 
 
-class CiudadInteligente(BFSMixin, DFSMixin, CostoUniformeMixin):
+class CiudadInteligente(BFSMixin, DFSMixin, CostoUniformeMixin, AvaraMixin):
     def __init__(self, archivo_mapa):
         self.mapa = self.cargar_mapa(archivo_mapa)
         self.posicion_vehiculo = self.encontrar_posicion(2)
@@ -296,6 +297,15 @@ class InterfazCiudadGUI:
             # Realizar la búsqueda de costo uniforme
             try:
                 camino, nodos_expandidos, costo_total, exploracion = self.ciudad.busqueda_costo_uniforme_total()
+            except AttributeError as e:
+                messagebox.showerror("Error", f"Error en la búsqueda: {e}")
+                # Habilitar botones nuevamente
+                self.habilitar_botones()
+                return
+        elif tipo_busqueda == "Informada" and algoritmo == "Avara":
+            # Realizar la búsqueda avara
+            try:
+                camino, nodos_expandidos, exploracion = self.ciudad.busqueda_avara_total()
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
                 # Habilitar botones nuevamente
