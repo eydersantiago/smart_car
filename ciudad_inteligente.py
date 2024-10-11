@@ -5,9 +5,10 @@ from amplitud import BFSMixin
 from busqueda_no_informada import DFSMixin 
 from costo_uniforme import CostoUniformeMixin
 from avara import AvaraMixin
+from a_start import AStarMixin
 
 
-class CiudadInteligente(BFSMixin, DFSMixin, CostoUniformeMixin, AvaraMixin):
+class CiudadInteligente(BFSMixin, DFSMixin, CostoUniformeMixin, AvaraMixin, AStarMixin):
     def __init__(self, archivo_mapa):
         self.mapa = self.cargar_mapa(archivo_mapa)
         self.posicion_vehiculo = self.encontrar_posicion(2)
@@ -306,6 +307,15 @@ class InterfazCiudadGUI:
             # Realizar la búsqueda avara
             try:
                 camino, nodos_expandidos, exploracion = self.ciudad.busqueda_avara_total()
+            except AttributeError as e:
+                messagebox.showerror("Error", f"Error en la búsqueda: {e}")
+                # Habilitar botones nuevamente
+                self.habilitar_botones()
+                return
+        elif tipo_busqueda == "Informada" and algoritmo == "A*":
+            # Realizar la búsqueda avara
+            try:
+                camino, nodos_expandidos, exploracion = self.ciudad.busqueda_a_estrella()
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
                 # Habilitar botones nuevamente
