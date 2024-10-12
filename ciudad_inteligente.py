@@ -6,7 +6,7 @@ from busqueda_no_informada import DFSMixin
 from costo_uniforme import CostoUniformeMixin
 from avara import AvaraMixin
 from a_start import AStarMixin
-
+import time
 
 class CiudadInteligente(BFSMixin, DFSMixin, CostoUniformeMixin, AvaraMixin, AStarMixin):
     def __init__(self, archivo_mapa):
@@ -277,7 +277,11 @@ class InterfazCiudadGUI:
         if tipo_busqueda == "No informada" and algoritmo == "Amplitud":
             # Realizar la búsqueda por amplitud
             try:
+                start_time = time.time()
                 camino, nodos_expandidos, exploracion = self.ciudad.busqueda_amplitud_total()
+                end_time = time.time()
+                execution_time = end_time - start_time
+                algoritmo_seleccionado = "Amplitud"
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
                 # Habilitar botones nuevamente
@@ -287,7 +291,11 @@ class InterfazCiudadGUI:
         elif tipo_busqueda == "No informada" and algoritmo == "Profundidad evitando ciclos":
             # Realizar la búsqueda por profundidad
             try:
+                start_time = time.time()
                 camino, nodos_expandidos, exploracion = self.ciudad.busqueda_profundidad_total()
+                end_time = time.time()
+                execution_time = end_time - start_time
+                algoritmo_seleccionado = "Profundidad evitando ciclos"
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
                 # Habilitar botones nuevamente
@@ -297,7 +305,11 @@ class InterfazCiudadGUI:
         elif tipo_busqueda == "No informada" and algoritmo == "Costo uniforme":
             # Realizar la búsqueda de costo uniforme
             try:
+                start_time = time.time()
                 camino, nodos_expandidos, costo_total, exploracion = self.ciudad.busqueda_costo_uniforme_total()
+                end_time = time.time()
+                execution_time = end_time - start_time
+                algoritmo_seleccionado = "Costo uniforme"
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
                 # Habilitar botones nuevamente
@@ -306,7 +318,11 @@ class InterfazCiudadGUI:
         elif tipo_busqueda == "Informada" and algoritmo == "Avara":
             # Realizar la búsqueda avara
             try:
+                start_time = time.time()
                 camino, nodos_expandidos, exploracion = self.ciudad.busqueda_avara_total()
+                end_time = time.time()
+                execution_time = end_time - start_time
+                algoritmo_seleccionado = "Avara"
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
                 # Habilitar botones nuevamente
@@ -315,7 +331,11 @@ class InterfazCiudadGUI:
         elif tipo_busqueda == "Informada" and algoritmo == "A*":
             # Realizar la búsqueda avara
             try:
+                start_time = time.time()
                 camino, nodos_expandidos, exploracion = self.ciudad.busqueda_a_estrella()
+                end_time = time.time()
+                execution_time = end_time - start_time
+                algoritmo_seleccionado = "A*"
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
                 # Habilitar botones nuevamente
@@ -336,6 +356,8 @@ class InterfazCiudadGUI:
         self.exploracion = exploracion
         self.camino = camino
         self.nodos_expandidos = nodos_expandidos
+        self.execution_time = execution_time
+        self.algoritmo_seleccionado = algoritmo_seleccionado
         self.paso_actual = 0
         self.dibujar_mapa()
         self.animar_busqueda()
@@ -361,7 +383,7 @@ class InterfazCiudadGUI:
         else:
             # Dibujar el camino final
             self.dibujar_camino(self.camino)
-            mensaje = f"Algoritmo: Amplitud\nNodos expandidos: {self.nodos_expandidos}"
+            mensaje = f"Algoritmo: {self.algoritmo_seleccionado}\nNodos expandidos: {self.nodos_expandidos}\nTiempo de ejecución: {self.execution_time}"
             self.mensaje_estado.config(text=mensaje)
             # Iniciar la animación de movimiento del auto
             self.mover_imagen(self.camino)
