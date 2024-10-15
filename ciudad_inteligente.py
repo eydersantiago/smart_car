@@ -15,6 +15,7 @@ class CiudadInteligente(BFSMixin, DFSMixin, CostoUniformeMixin, AvaraMixin, ASta
         self.posicion_pasajero = self.encontrar_posicion(5)
         self.destino = self.encontrar_posicion(6)
         self.contador_nodos = 0  # Inicializar el contador de nodos
+        self.costo_total = 0
 
     def cargar_mapa(self, archivo_mapa):
         """
@@ -51,7 +52,7 @@ class InterfazCiudadGUI:
     def __init__(self):
         self.ventana = tk.Tk()
         self.ventana.title("Ciudad Inteligente")
-        self.ventana.geometry('900x700')
+        self.ventana.geometry('900x800')
         self.ventana.configure(bg='#dad082')
         self.crear_frames()
         self.crear_cuadricula()
@@ -271,8 +272,9 @@ class InterfazCiudadGUI:
         self.menu_busqueda.config(state=tk.DISABLED)
         self.menu_algoritmo.config(state=tk.DISABLED)
 
-        # Resetear el contador de nodos
         self.ciudad.contador_nodos = 0
+        self.ciudad.costo_total = 0
+        costo_total = 0 
 
         if tipo_busqueda == "No informada" and algoritmo == "Amplitud":
             # Realizar la búsqueda por amplitud
@@ -357,6 +359,7 @@ class InterfazCiudadGUI:
         self.camino = camino
         self.nodos_expandidos = nodos_expandidos
         self.execution_time = execution_time
+        self.costo_total = costo_total
         self.algoritmo_seleccionado = algoritmo_seleccionado
         self.paso_actual = 0
         self.dibujar_mapa()
@@ -383,7 +386,11 @@ class InterfazCiudadGUI:
         else:
             # Dibujar el camino final
             self.dibujar_camino(self.camino)
-            mensaje = f"Algoritmo: {self.algoritmo_seleccionado}\nNodos expandidos: {self.nodos_expandidos}\nTiempo de ejecución: {self.execution_time}"
+            if self.costo_total != 0 :
+                mensaje = f"Algoritmo: {self.algoritmo_seleccionado}\nNodos expandidos: {self.nodos_expandidos}\nTiempo de ejecución: {self.execution_time}\nCosto total: {self.costo_total}"
+            else:
+                mensaje = f"Algoritmo: {self.algoritmo_seleccionado}\nNodos expandidos: {self.nodos_expandidos}\nTiempo de ejecución: {self.execution_time}\nCosto total: No aplica"
+
             self.mensaje_estado.config(text=mensaje)
             # Iniciar la animación de movimiento del auto
             self.mover_imagen(self.camino)
