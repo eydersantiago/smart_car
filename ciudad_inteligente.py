@@ -5,7 +5,7 @@ from amplitud import BFSMixin
 from busqueda_no_informada import DFSMixin 
 from costo_uniforme import CostoUniformeMixin
 from avara import AvaraMixin
-from a_start import AStarMixin
+from a_star import AStarMixin
 import time
 
 class CiudadInteligente(BFSMixin, DFSMixin, CostoUniformeMixin, AvaraMixin, AStarMixin):
@@ -14,7 +14,7 @@ class CiudadInteligente(BFSMixin, DFSMixin, CostoUniformeMixin, AvaraMixin, ASta
         self.posicion_vehiculo = self.encontrar_posicion(2)
         self.posicion_pasajero = self.encontrar_posicion(5)
         self.destino = self.encontrar_posicion(6)
-        self.contador_nodos = 0  # Inicializar el contador de nodos
+        self.contador_nodos = 0  
 
         self.costo_total = 0
         self.profundidad = 0
@@ -62,12 +62,12 @@ class InterfazCiudadGUI:
         self.crear_widgets()
         self.archivo_mapa = None
         self.ciudad = None
-        self.imagen_auto = None  # Para mantener la referencia de PhotoImage
-        self.imagen_auto_id = None  # ID del objeto de la imagen en el Canvas
-        self.imagen_persona = None  # Para la imagen del pasajero
-        self.imagen_persona_id = None  # ID del objeto de la imagen del pasajero
-        self.imagen_ubicacion = None  # Para la imagen del destino
-        self.imagen_ubicacion_id = None  # ID del objeto de la imagen del destino
+        self.imagen_auto = None  
+        self.imagen_auto_id = None  
+        self.imagen_persona = None  
+        self.imagen_persona_id = None  
+        self.imagen_ubicacion = None  
+        self.imagen_ubicacion_id = None  
         self.ventana.mainloop()
 
     def crear_frames(self):
@@ -135,7 +135,6 @@ class InterfazCiudadGUI:
         frame_accion = tk.Frame(self.frame_botones, bg='#6f96b4')
         frame_accion.pack(side=tk.RIGHT, padx=20, pady=20)
 
-        # Botones
         self.boton_cargar = tk.Button(
             frame_accion,
             text="Cargar Archivo",
@@ -157,7 +156,7 @@ class InterfazCiudadGUI:
             activebackground='#007bb5',
             width=15,
             command=self.ejecutar_busqueda,
-            state=tk.DISABLED  # Deshabilitado hasta cargar el mapa
+            state=tk.DISABLED 
         )
         self.boton_buscar.pack(side=tk.LEFT, padx=5)
 
@@ -187,14 +186,13 @@ class InterfazCiudadGUI:
         archivo = filedialog.askopenfilename(filetypes=[("Archivos de texto", "*.txt")])
         if archivo:
             self.archivo_mapa = archivo
-            self.ciudad = CiudadInteligente(archivo)  # Crear instancia de CiudadInteligente
+            self.ciudad = CiudadInteligente(archivo)  
             self.dibujar_mapa()
             self.menu_algoritmo.config(state=tk.NORMAL)
             self.boton_buscar.config(state=tk.NORMAL)
             self.mensaje_estado.config(text="Mapa cargado correctamente.")
 
     def dibujar_mapa(self):
-        # Dibuja el mapa en el canvas usando colores para diferentes valores
         self.canvas.delete("all")
         self.rectangulos = []
         for i, fila in enumerate(self.ciudad.mapa):
@@ -202,27 +200,26 @@ class InterfazCiudadGUI:
             for j, valor in enumerate(fila):
                 x1, y1 = j * self.tam_celda, i * self.tam_celda
                 x2, y2 = x1 + self.tam_celda, y1 + self.tam_celda
-                # Asigna un color basado en el valor del mapa
+                
                 color = 'white'
                 if valor == 0:
                     color = 'white'  
                 elif valor == 1:
                     color = 'grey'
                 elif valor == 2:
-                    color = 'blue'  # Vehículo
+                    color = 'blue'  
                 elif valor == 3:
                     color = 'orange'
                 elif valor == 4:
                     color = 'red'      
                 elif valor == 5:
-                    color = 'purple'  # Pasajero
+                    color = 'purple'  
                 elif valor == 6:
-                    color = 'green'  # Destino
+                    color = 'green'  
                 rect = self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline='black')
                 fila_rectangulos.append(rect)
             self.rectangulos.append(fila_rectangulos)
 
-        # Cargar y colocar la imagen del pasajero (persona.png)
         try:
             imagen_persona_original = Image.open("images/persona.png")
             imagen_persona_redimensionada = imagen_persona_original.resize((self.tam_celda, self.tam_celda), Image.LANCZOS)
@@ -234,7 +231,6 @@ class InterfazCiudadGUI:
         except Exception as e:
             print(f"Error al cargar la imagen 'persona.png': {e}")
 
-        # Cargar y colocar la imagen de ubicación (ubicacion.png)
         try:
             imagen_ubicacion_original = Image.open("images/ubicacion.png")
             imagen_ubicacion_redimensionada = imagen_ubicacion_original.resize((self.tam_celda, self.tam_celda), Image.LANCZOS)
@@ -246,7 +242,7 @@ class InterfazCiudadGUI:
         except Exception as e:
             print(f"Error al cargar la imagen 'ubicacion.png': {e}")
 
-        # Cargar y colocar la imagen del vehículo (auto-inteligente.png)
+
         try:
             imagen_original = Image.open("images/auto-inteligente.png")
             imagen_redimensionada = imagen_original.resize((self.tam_celda, self.tam_celda), Image.LANCZOS)
@@ -254,7 +250,7 @@ class InterfazCiudadGUI:
             inicio = self.ciudad.posicion_vehiculo
             x = inicio[1] * self.tam_celda + self.tam_celda / 2
             y = inicio[0] * self.tam_celda + self.tam_celda / 2
-            # Si ya existe una imagen, eliminarla
+
             if self.imagen_auto_id:
                 self.canvas.delete(self.imagen_auto_id)
             self.imagen_auto_id = self.canvas.create_image(x, y, image=self.imagen_auto)
@@ -269,7 +265,6 @@ class InterfazCiudadGUI:
         tipo_busqueda = self.tipo_busqueda.get()
         algoritmo = self.algoritmo.get()
 
-        # Deshabilitar botones durante la búsqueda
         self.boton_buscar.config(state=tk.DISABLED)
         self.boton_cargar.config(state=tk.DISABLED)
         self.menu_busqueda.config(state=tk.DISABLED)
@@ -280,7 +275,7 @@ class InterfazCiudadGUI:
         costo_total = 0 
 
         if tipo_busqueda == "No informada" and algoritmo == "Amplitud":
-            # Realizar la búsqueda por amplitud
+ 
             try:
                 start_time = time.time()
                 camino, nodos_expandidos, profundidad_arbol, exploracion = self.ciudad.busqueda_amplitud_total()
@@ -289,12 +284,12 @@ class InterfazCiudadGUI:
                 algoritmo_seleccionado = "Amplitud"
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
-                # Habilitar botones nuevamente
+
                 self.habilitar_botones()
                 return
 
         elif tipo_busqueda == "No informada" and algoritmo == "Profundidad evitando ciclos":
-            # Realizar la búsqueda por profundidad
+
             try:
                 start_time = time.time()
                 camino, nodos_expandidos, profundidad_arbol, exploracion = self.ciudad.busqueda_profundidad_total()
@@ -303,12 +298,12 @@ class InterfazCiudadGUI:
                 algoritmo_seleccionado = "Profundidad evitando ciclos"
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
-                # Habilitar botones nuevamente
+  
                 self.habilitar_botones()
                 return
 
         elif tipo_busqueda == "No informada" and algoritmo == "Costo uniforme":
-            # Realizar la búsqueda de costo uniforme
+
             try:
                 start_time = time.time()
                 camino, nodos_expandidos, profundidad_arbol, costo_total, exploracion = self.ciudad.busqueda_costo_uniforme_total()
@@ -317,11 +312,11 @@ class InterfazCiudadGUI:
                 algoritmo_seleccionado = "Costo uniforme"
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
-                # Habilitar botones nuevamente
+       
                 self.habilitar_botones()
                 return
         elif tipo_busqueda == "Informada" and algoritmo == "Avara":
-            # Realizar la búsqueda avara
+         
             try:
                 start_time = time.time()
                 camino, nodos_expandidos, profundidad_arbol, exploracion = self.ciudad.busqueda_avara_total()
@@ -330,11 +325,11 @@ class InterfazCiudadGUI:
                 algoritmo_seleccionado = "Avara"
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
-                # Habilitar botones nuevamente
+             
                 self.habilitar_botones()
                 return
         elif tipo_busqueda == "Informada" and algoritmo == "A*":
-            # Realizar la búsqueda avara
+  
             try:
                 start_time = time.time()
                 camino, nodos_expandidos, profundidad_arbol, exploracion, costo_total = self.ciudad.busqueda_a_estrella()
@@ -344,7 +339,7 @@ class InterfazCiudadGUI:
                 algoritmo_seleccionado = "A*"
             except AttributeError as e:
                 messagebox.showerror("Error", f"Error en la búsqueda: {e}")
-                # Habilitar botones nuevamente
+  
                 self.habilitar_botones()
                 return
 
@@ -358,7 +353,6 @@ class InterfazCiudadGUI:
             self.habilitar_botones()
             return
 
-        # Iniciar la animación de la búsqueda
         self.exploracion = exploracion
         self.camino = camino
         self.nodos_expandidos = nodos_expandidos
@@ -371,7 +365,7 @@ class InterfazCiudadGUI:
         self.animar_busqueda()
 
     def habilitar_botones(self):
-        # Habilitar botones nuevamente
+
         self.boton_buscar.config(state=tk.NORMAL)
         self.boton_cargar.config(state=tk.NORMAL)
         self.menu_busqueda.config(state=tk.NORMAL)
@@ -383,13 +377,13 @@ class InterfazCiudadGUI:
             nodo = self.exploracion[self.paso_actual]
             fila, columna = nodo
             rect = self.rectangulos[fila][columna]
-            # Color de exploración (por ejemplo, azul claro)
+
             self.canvas.itemconfig(rect, fill='lightblue')
             self.paso_actual += 1
-            # Programar el siguiente paso
-            self.ventana.after(40, self.animar_busqueda)  # Ajusta el tiempo según prefieras
+
+            self.ventana.after(40, self.animar_busqueda)
         else:
-            # Dibujar el camino final
+
             self.dibujar_camino(self.camino)
 
             if self.costo_total != 0 :
@@ -398,9 +392,9 @@ class InterfazCiudadGUI:
                 mensaje = f"Algoritmo: {self.algoritmo_seleccionado}\nNodos expandidos: {self.nodos_expandidos}\nTiempo de ejecución: {self.execution_time}\nProfundidad del árbol: {self.profundidad_arbol}\nCosto total: No aplica"
 
             self.mensaje_estado.config(text=mensaje)
-            # Iniciar la animación de movimiento del auto
+
             self.mover_imagen(self.camino)
-            # Habilitar botones nuevamente
+
             self.boton_buscar.config(state=tk.NORMAL)
             self.boton_cargar.config(state=tk.NORMAL)
             self.menu_busqueda.config(state=tk.NORMAL)
@@ -410,11 +404,10 @@ class InterfazCiudadGUI:
         if camino:
             for (fila, columna) in camino:
                 rect = self.rectangulos[fila][columna]
-                # Evitar colorear el inicio, pasajero y destino nuevamente
+
                 valor = self.ciudad.mapa[fila][columna]
                 if valor not in [2, 5, 6]:
                     self.canvas.itemconfig(rect, fill="yellow")
-            # Resaltar el inicio, pasajero y destino con colores específicos
             inicio = self.ciudad.posicion_vehiculo
             pasajero = self.ciudad.posicion_pasajero
             destino = self.ciudad.destino
@@ -429,33 +422,25 @@ class InterfazCiudadGUI:
             y = fila * self.tam_celda + self.tam_celda / 2
             self.canvas.coords(self.imagen_auto_id, x, y)
 
-            # Verificar si ha llegado al pasajero para eliminar la imagen del pasajero
             if (fila, columna) == self.ciudad.posicion_pasajero and self.imagen_persona_id:
                 self.canvas.delete(self.imagen_persona_id)
-                self.imagen_persona_id = None  # Evitar intentos de eliminación posteriores
+                self.imagen_persona_id = None 
 
-            # Verificar si ha llegado al destino para superponer la imagen del pasajero y ocultar ubicacion.png
             if (fila, columna) == self.ciudad.destino:
-                # Cargar y superponer la imagen del pasajero sobre el auto
                 try:
                     imagen_persona_original = Image.open("images/persona.png")
                     imagen_persona_redimensionada = imagen_persona_original.resize((self.tam_celda, self.tam_celda), Image.LANCZOS)
                     self.imagen_persona_destino = ImageTk.PhotoImage(imagen_persona_redimensionada)
-                    # Crear la imagen del pasajero superpuesta al auto
                     self.imagen_persona_destino_id = self.canvas.create_image(x, y, image=self.imagen_persona_destino)
                 except Exception as e:
                     print(f"Error al cargar la imagen 'persona.png' en el destino: {e}")
 
-                # Ocultar la imagen de ubicación (ubicacion.png)
                 if self.imagen_ubicacion_id:
                     self.canvas.itemconfigure(self.imagen_ubicacion_id, state='hidden')
 
-            # Programar el siguiente movimiento
             self.ventana.after(100, lambda: self.mover_imagen(camino, index + 1))
         else:
-            # Llegó al destino
             print("El auto ha llegado al destino.")
-            # Opcional: Puedes realizar acciones adicionales aquí si lo deseas
 
 if __name__ == "__main__":
     InterfazCiudadGUI()
