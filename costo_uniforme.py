@@ -40,7 +40,6 @@ class CostoUniformeMixin:
         Realiza búsqueda de costo uniforme desde el vehículo al pasajero y luego del pasajero al destino.
         Retorna el camino completo, el total de nodos expandidos, el costo total y el orden de exploración.
         """
-        # Primera búsqueda: Vehículo -> Pasajero
         print("Iniciando búsqueda de costo uniforme: Vehículo -> Pasajero")
         camino1, nodos1, profundidad1, costo1, exploracion1 = self.busqueda_costo_uniforme(self.posicion_vehiculo, self.posicion_pasajero)
         if not camino1:
