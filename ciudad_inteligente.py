@@ -334,7 +334,7 @@ class InterfazCiudadGUI:
             # Realizar la búsqueda avara
             try:
                 start_time = time.time()
-                camino, nodos_expandidos, exploracion = self.ciudad.busqueda_a_estrella()
+                camino, nodos_expandidos, exploracion, costo_total  = self.ciudad.busqueda_a_estrella()
                 end_time = time.time()
                 execution_time = end_time - start_time
                 algoritmo_seleccionado = "A*"
