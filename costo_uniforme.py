@@ -10,6 +10,7 @@ class CostoUniformeMixin:
         cola = [(0, inicio, [inicio])]  
         visitados = set()
         nodos_expandidos = 0
+        self.profundidad = 0
         exploracion = []  
 
         while cola:

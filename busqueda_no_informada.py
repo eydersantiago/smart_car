@@ -9,7 +9,8 @@ class DFSMixin:
         visitados = set([inicio])  
         padres = {}  
         exploracion = []  
-        contador_nodos = 0 
+        contador_nodos = 0
+        self.profundidad = 0 
 
         while pila:
             actual = pila.pop()

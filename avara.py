@@ -13,6 +13,7 @@ class AvaraMixin:
         cola = [(heuristica(inicio), inicio, [inicio])]  
         visitados = set()
         nodos_expandidos = 0
+        self.profundidad = 0
         exploracion = [] 
 
         while cola:

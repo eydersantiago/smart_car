@@ -12,7 +12,8 @@ class BFSMixin:
         cola.append(inicio) 
         
         visitados = set() 
-        visitados.add(inicio) 
+        visitados.add(inicio)
+        self.profundidad = 0 
         
         padres = {} 
         exploracion = [] 
