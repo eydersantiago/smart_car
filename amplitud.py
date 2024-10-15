@@ -18,7 +18,6 @@ class BFSMixin:
         
         padres = {} # Diccionario para almacenar los padres de cada nodo para reconstruir el camino
         exploracion = [] # Lista para almacenar el orden de exploración de los nodos
-        
 
         # Mientras haya nodos en la cola, se continua explorando
         while cola:
@@ -26,6 +25,9 @@ class BFSMixin:
             exploracion.append(actual) # Añade el nodo actual a la lista de exploración
             self.contador_nodos += 1  # Incrementamos el contador de nodos expandidos
             #self.contador_nodos += 1  
+           
+        # Actualizar la profundidad
+
             print(f"Nodo {self.contador_nodos}: {actual}")  # Imprimimos el nodo visitado
             
             # Si hemos alcanzado el nodo objetivo, reconstruimos el camino desde el objetivo al inicio
@@ -36,9 +38,11 @@ class BFSMixin:
                 while actual in padres:
                     camino.append(actual) 
                     actual = padres[actual]
+                    self.profundidad +=1 
                 camino.append(inicio) # Añadimos el nodo de inicio al final
                 camino.reverse() # Invertimos el camino para que vaya de inicio a objetivo
-                return camino, len(visitados), exploracion # Devolvemos el camino y los resultado
+                
+                return camino, len(visitados), self.profundidad, exploracion # Devolvemos el camino y los resultado
 
             # Recorremos los vecinos  del nodo actual
             for vecino in self.vecinos(actual):
@@ -48,7 +52,7 @@ class BFSMixin:
                     padres[vecino] = actual # Registramos el nodo actual como padre del vecino
                     cola.append(vecino) # Añadimos el vecino a la cola para explorar
 
-        return None, len(visitados), exploracion  # Si no encuentra el objetivo, devuelve None y los resultados de la búsqueda
+        return None, len(visitados), self.profundidad, exploracion  # Si no encuentra el objetivo, devuelve None y los resultados de la búsqueda
 
 
     def busqueda_amplitud_total(self):
@@ -56,26 +60,27 @@ class BFSMixin:
         Realiza BFS desde el vehículo al pasajero y luego del pasajero al destino.
         Retorna el camino completo, el total de nodos expandidos y el orden de exploración.
         """
-        
+
         # Primera búsqueda: Vehículo -> Pasajero
         print("Iniciando BFS: Vehículo -> Pasajero")
-        camino1, nodos1, exploracion1 = self.busqueda_amplitud(self.posicion_vehiculo, self.posicion_pasajero)
+        camino1, nodos1, profundidad1, exploracion1 = self.busqueda_amplitud(self.posicion_vehiculo, self.posicion_pasajero)
         if not camino1: # Si no se encuentra el pasajero, finaliza la búsqueda y devuelve los resultados hasta el momento
-            return None, nodos1, exploracion1  
+            return None, nodos1, profundidad1, exploracion1  
 
 
         # Segunda búsqueda: Pasajero -> Destino
         print("Iniciando BFS: Pasajero -> Destino")
-        camino2, nodos2, exploracion2 = self.busqueda_amplitud(self.posicion_pasajero, self.destino)
+        camino2, nodos2, profundidad2, exploracion2 = self.busqueda_amplitud(self.posicion_pasajero, self.destino)
         if not camino2: # Si no se encuentra el destino, finaliza la búsqueda y devuelve los resultados hasta el momento
-            return None, nodos1 + nodos2, exploracion1 + exploracion2  # No encontró el destino
+            return None, nodos1 + nodos2, max(profundidad1, profundidad2), exploracion1 + exploracion2  # No encontró el destino
         
 
         # Combinamos los caminos de las dos búsquedas, evitando duplicar el pasajero
         camino_total = camino1 + camino2[1:]
 
+
         # Combinamos las exploraciones de ambas búsquedas
         exploracion_total = exploracion1 + exploracion2
 
         # Devolvemos el camino completo, el número total de nodos expandidos y el orden de exploración
-        return camino_total, self.contador_nodos, exploracion_total
+        return camino_total, self.contador_nodos, self.profundidad, exploracion_total

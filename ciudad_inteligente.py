@@ -15,6 +15,7 @@ class CiudadInteligente(BFSMixin, DFSMixin, CostoUniformeMixin, AvaraMixin, ASta
         self.posicion_pasajero = self.encontrar_posicion(5)
         self.destino = self.encontrar_posicion(6)
         self.contador_nodos = 0  # Inicializar el contador de nodos
+        self.profundidad = 0
 
     def cargar_mapa(self, archivo_mapa):
         """
@@ -77,7 +78,7 @@ class InterfazCiudadGUI:
         self.frame_botones.configure(height=100)
 
     def crear_cuadricula(self):
-        self.tam_celda = 50
+        self.tam_celda = 47
         self.ancho_mapa = self.tam_celda * 10  
         self.alto_mapa = self.tam_celda * 10  
         self.canvas = tk.Canvas(
@@ -273,12 +274,12 @@ class InterfazCiudadGUI:
 
         # Resetear el contador de nodos
         self.ciudad.contador_nodos = 0
-
+        
         if tipo_busqueda == "No informada" and algoritmo == "Amplitud":
             # Realizar la búsqueda por amplitud
             try:
                 start_time = time.time()
-                camino, nodos_expandidos, exploracion = self.ciudad.busqueda_amplitud_total()
+                camino, nodos_expandidos, profundidad_arbol, exploracion = self.ciudad.busqueda_amplitud_total()
                 end_time = time.time()
                 execution_time = end_time - start_time
                 algoritmo_seleccionado = "Amplitud"
@@ -292,7 +293,7 @@ class InterfazCiudadGUI:
             # Realizar la búsqueda por profundidad
             try:
                 start_time = time.time()
-                camino, nodos_expandidos, exploracion = self.ciudad.busqueda_profundidad_total()
+                camino, nodos_expandidos, profundidad_arbol, exploracion = self.ciudad.busqueda_profundidad_total()
                 end_time = time.time()
                 execution_time = end_time - start_time
                 algoritmo_seleccionado = "Profundidad evitando ciclos"
@@ -306,7 +307,7 @@ class InterfazCiudadGUI:
             # Realizar la búsqueda de costo uniforme
             try:
                 start_time = time.time()
-                camino, nodos_expandidos, costo_total, exploracion = self.ciudad.busqueda_costo_uniforme_total()
+                camino, nodos_expandidos, profundidad_arbol, costo_total, exploracion = self.ciudad.busqueda_costo_uniforme_total()
                 end_time = time.time()
                 execution_time = end_time - start_time
                 algoritmo_seleccionado = "Costo uniforme"
@@ -319,7 +320,7 @@ class InterfazCiudadGUI:
             # Realizar la búsqueda avara
             try:
                 start_time = time.time()
-                camino, nodos_expandidos, exploracion = self.ciudad.busqueda_avara_total()
+                camino, nodos_expandidos, profundidad_arbol, exploracion = self.ciudad.busqueda_avara_total()
                 end_time = time.time()
                 execution_time = end_time - start_time
                 algoritmo_seleccionado = "Avara"
@@ -332,7 +333,7 @@ class InterfazCiudadGUI:
             # Realizar la búsqueda avara
             try:
                 start_time = time.time()
-                camino, nodos_expandidos, exploracion = self.ciudad.busqueda_a_estrella()
+                camino, nodos_expandidos, profundidad_arbol, exploracion = self.ciudad.busqueda_a_estrella()
                 end_time = time.time()
                 execution_time = end_time - start_time
                 algoritmo_seleccionado = "A*"
@@ -356,6 +357,7 @@ class InterfazCiudadGUI:
         self.exploracion = exploracion
         self.camino = camino
         self.nodos_expandidos = nodos_expandidos
+        self.profundidad_arbol = profundidad_arbol
         self.execution_time = execution_time
         self.algoritmo_seleccionado = algoritmo_seleccionado
         self.paso_actual = 0
@@ -379,11 +381,14 @@ class InterfazCiudadGUI:
             self.canvas.itemconfig(rect, fill='lightblue')
             self.paso_actual += 1
             # Programar el siguiente paso
-            self.ventana.after(50, self.animar_busqueda)  # Ajusta el tiempo según prefieras
+            self.ventana.after(40, self.animar_busqueda)  # Ajusta el tiempo según prefieras
         else:
             # Dibujar el camino final
             self.dibujar_camino(self.camino)
-            mensaje = f"Algoritmo: {self.algoritmo_seleccionado}\nNodos expandidos: {self.nodos_expandidos}\nTiempo de ejecución: {self.execution_time}"
+            mensaje = (f"Algoritmo: {self.algoritmo_seleccionado}\n"
+                       f"Nodos expandidos: {self.nodos_expandidos}\n"
+                       f"Profundidad del árbol: {self.profundidad_arbol}\n"
+                       f"Tiempo de ejecución: {self.execution_time:.4f} segundos")
             self.mensaje_estado.config(text=mensaje)
             # Iniciar la animación de movimiento del auto
             self.mover_imagen(self.camino)
